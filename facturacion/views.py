@@ -163,3 +163,16 @@ def producto_detalle(request, pk):                         # READ (uno): la fich
     contexto = {"producto": producto}                      # Solo necesitamos enviar el producto
     return render(request, "facturacion/producto_detalle.html", contexto)
     # Esta vista solo atiende GET: no tiene formulario, así que no pregunta por request.method
+
+def producto_eliminar(request, pk):                        # DELETE
+    producto = get_object_or_404(Producto, pk=pk)          # Buscamos el producto o mostramos 404
+
+    if request.method == "POST":                           # ¿Presionó "Sí, eliminar"?
+        nombre = producto.nombre                           # Guardamos el nombre para el mensaje
+        producto.delete()                                  # DELETE del producto y de sus filas en la tabla intermedia
+        messages.success(request, f"Producto «{nombre}» eliminado.")   # (la marca y las categorías NO se borran)
+        return redirect("facturacion:producto_lista")
+
+    # Llegó por GET: mostramos la pregunta "¿Seguro?"
+    contexto = {"titulo": "Eliminar producto", "producto": producto}
+    return render(request, "facturacion/producto_eliminar.html", contexto)

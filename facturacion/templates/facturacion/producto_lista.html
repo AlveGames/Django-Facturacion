@@ -27,7 +27,8 @@
                 {# start_index = número del primer producto de esta página (1, 6, 11...). add le suma la vuelta (0, 1, 2...) #}
                 <td>{{ page_obj.start_index|add:forloop.counter0 }}</td>
                 <td>
-                    <span class="fw-semibold">{{ producto.nombre }}</span>   {# En el paso 3.6 será un enlace #}
+                                        {# El nombre ahora es un enlace al detalle #}
+                    <a href="{% url 'facturacion:producto_detalle' producto.pk %}" class="fw-semibold text-decoration-none">{{ producto.nombre }}</a>   {# En el paso 3.6 será un enlace #}
                     {% if not producto.activo %}<span class="badge bg-secondary">Inactivo</span>{% endif %}
                 </td>
                 <td>{{ producto.marca.nombre }}</td>              {# 1:N: del producto llegas a SU marca con un punto #}
@@ -47,6 +48,7 @@
                 </td>
                 <td class="text-end text-nowrap">
                     <a href="{% url 'facturacion:producto_editar' producto.pk %}" class="btn btn-sm btn-outline-primary">Editar</a>
+                    <a href="{% url 'facturacion:producto_eliminar' producto.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
                     {# Aquí irán Editar (3.5) y Eliminar (3.7) #}
                 </td>
             </tr>
