@@ -1,0 +1,28 @@
+/* Variables: defines un color una sola vez y lo usas en todo el sitio con var(--nombre) */
+:root {
+    --verde: #0c4b33;
+    --verde-claro: #2f9e6e;
+    --amarillo: #f2c230;
+}
+body {
+    background-color: #f3f6f2;        /* fondo gris verdoso muy claro */
+    min-height: 100vh;                /* el cuerpo mide al menos lo que mide la pantalla */
+    display: flex;                    /* con flex en columna... */
+    flex-direction: column;
+}
+main { flex: 1; }                     /* ...el main se estira y el footer queda siempre abajo */
+.barra { background-color: var(--verde); }   /* fondo verde del menú */
+.titulo-pagina {                      /* títulos de cada página */
+    border-left: 6px solid var(--amarillo);  /* barrita amarilla a la izquierda */
+    padding-left: 12px;
+}
+.tarjeta {                            /* caja blanca para formularios y tablas */
+    background-color: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .06);  /* sombra suave */
+}
+.table thead th { background-color: var(--verde); color: white; }   /* encabezado de tablas en verde */
+.btn-verde { background-color: var(--verde); color: white; }        /* nuestro botón verde */
+.btn-verde:hover { background-color: var(--verde-claro); color: white; }
+.pie { background-color: #13201a; color: #cfd8d3; }                 /* pie de página oscuro */

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block titulo %}{{ titulo }}{% endblock %}          {# "Nuevo producto" o "Editar producto: ..." #}
+
+{% block contenido %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="tarjeta">
+            <h1 class="h4 titulo-pagina mb-4">{{ titulo }}</h1>
+
+            {# Errores que no son de un campo concreto (por ejemplo, de una validación general) #}
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            {# method="post" + sin action → se envía a la MISMA dirección (crear o editar) #}
+            <form method="post" novalidate>
+                {% csrf_token %}                      {# Obligatorio en todo POST #}
+
+                {# En Marcas escribimos campo por campo. Aquí los recorremos con un for: sirve para 3 o para 10 campos #}
+                {% for campo in form %}               {# Recorre TODOS los campos del formulario, en el orden de fields #}
+                    <div class="mb-3">
+                        {# label = texto de la etiqueta; id_for_label = id de la caja #}
+                        <label class="form-label fw-semibold" for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+                        {{ campo }}                   {# Dibuja la caja, la lista desplegable o las casillas #}
+                        {% for error in campo.errors %}   {# Errores de este campo, si hay #}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}                          {# Fin del recorrido de campos #}
+
+                <button type="submit" class="btn btn-verde">{{ boton }}</button>          {# "Guardar" o "Actualizar" #}
+                <a href="{% url 'facturacion:producto_lista' %}" class="btn btn-outline-secondary">Cancelar</a>   {# GET: vuelve sin guardar #}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
