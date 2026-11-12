@@ -21,4 +21,10 @@ urlpatterns = [
     path("categorias/crear/", views.categoria_crear, name="categoria_crear"),                    # Crear
     path("categorias/editar/<int:pk>/", views.categoria_editar, name="categoria_editar"),        # Editar
     path("categorias/eliminar/<int:pk>/", views.categoria_eliminar, name="categoria_eliminar"),  # Eliminar
+        # ---------- CLIENTES (Tarea 2 · Unidad 5) ----------
+    path("clientes/", views.cliente_lista, name="cliente_lista"),                          # Listar
+    path("clientes/crear/", views.cliente_crear, name="cliente_crear"),                    # Crear
+    path("clientes/<int:pk>/", views.cliente_detalle, name="cliente_detalle"),             # Ver uno (opcional)
+    path("clientes/editar/<int:pk>/", views.cliente_editar, name="cliente_editar"),        # Editar
+    path("clientes/eliminar/<int:pk>/", views.cliente_eliminar, name="cliente_eliminar"),  # Eliminar
 ]

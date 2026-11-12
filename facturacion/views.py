@@ -1,10 +1,10 @@
 from django.contrib import messages                        # Mensajes de éxito y error
 from django.core.paginator import Paginator                # NUEVO: corta una lista en páginas
-from django.db.models import ProtectedError                # Error al borrar una marca que tiene productos
+from django.db.models import ProtectedError, Q             # Q: buscar con "O" (reto Clientes)                # Error al borrar una marca que tiene productos
 from django.shortcuts import render, redirect, get_object_or_404
 
-from .forms import CategoriaForm, MarcaForm, ProductoForm  # CategoriaForm: tarea Unidad 5
-from .models import Categoria, Marca, Producto             # Categoria: tarea Unidad 5
+from .forms import CategoriaForm, ClienteForm, MarcaForm, ProductoForm
+from .models import Categoria, Cliente, Marca, Producto           # Categoria: tarea Unidad 5
 
 from django.contrib.auth.decorators import login_required
 
@@ -242,3 +242,78 @@ def categoria_eliminar(request, pk):                       # DELETE · GET pregu
     # GET: mostramos la pregunta "¿Seguro?" y cuántos productos la usan
     contexto = {"titulo": "Eliminar categoría", "categoria": categoria}
     return render(request, "facturacion/categoria_eliminar.html", contexto)
+
+
+
+
+
+
+
+
+# =====================================================================
+# TAREA 2 · CLIENTES · Vistas Basadas en Funciones (VBF)
+# Base: el CRUD de Productos (pasos 3.3 a 3.8)
+# =====================================================================
+
+@login_required                                            # Sin sesión → /login/?next=...
+def cliente_lista(request):                                # READ · solo GET: lista, busca y pagina
+    q = request.GET.get("q", "")                           # 1. GET: texto del buscador (?q=perez). Si no hay, ""
+    clientes = Cliente.objects.all()                       # 2. Todos (ordenados por apellidos y nombres por el Meta)
+    if q:                                                  # 3. Si buscó algo...
+        # RETO · objetos Q: Q(...) | Q(...) = "esto O aquello" → WHERE apellidos LIKE ... OR cedula LIKE ...
+        clientes = clientes.filter(Q(apellidos__icontains=q) | Q(cedula__icontains=q))
+
+    paginador = Paginator(clientes, 5)                     # 4. Corta la lista de 5 en 5
+    page_obj = paginador.get_page(request.GET.get("page")) # 5. La página pedida (?page=2). Si es inválida, da una válida
+
+    contexto = {"titulo": "Clientes", "page_obj": page_obj, "q": q}   # q: para que el buscador no se borre
+    return render(request, "facturacion/cliente_lista.html", contexto)
+
+
+@login_required
+def cliente_crear(request):                                # CREATE
+    if request.method == "POST":                           # POST: el usuario presionó "Guardar"
+        form = ClienteForm(request.POST)                   # Formulario lleno con lo que escribió
+        if form.is_valid():                                # Revisa obligatorios, correo, cédula única y clean_cedula
+            cliente = form.save()                          # INSERT en la base de datos
+            messages.success(request, f"Cliente «{cliente}» creado correctamente.")
+            return redirect("facturacion:cliente_lista")   # Post/Redirect/Get: F5 no lo crea dos veces
+        messages.error(request, "Revisa los errores del formulario.")   # Si NO es válido: mensaje rojo + errores
+    else:                                                  # GET: solo abrió la página
+        form = ClienteForm()                               # Formulario vacío
+    contexto = {"titulo": "Nuevo cliente", "form": form, "boton": "Guardar"}
+    return render(request, "facturacion/cliente_form.html", contexto)
+
+
+@login_required
+def cliente_editar(request, pk):                           # UPDATE · pk viene de la URL: /clientes/editar/3/
+    cliente = get_object_or_404(Cliente, pk=pk)            # Lo buscamos; si no existe → 404
+    if request.method == "POST":                           # POST: presionó "Actualizar"
+        form = ClienteForm(request.POST, instance=cliente) # Datos nuevos sobre el cliente que ya existe
+        if form.is_valid():
+            form.save()                                    # UPDATE (no crea otro)
+            messages.success(request, f"Cliente «{cliente}» actualizado.")
+            return redirect("facturacion:cliente_lista")
+        messages.error(request, "Revisa los errores del formulario.")
+    else:                                                  # GET: formulario LLENO con los datos actuales
+        form = ClienteForm(instance=cliente)
+    contexto = {"titulo": f"Editar cliente: {cliente}", "form": form, "boton": "Actualizar"}
+    return render(request, "facturacion/cliente_form.html", contexto)   # Mismo template que crear
+
+
+@login_required
+def cliente_detalle(request, pk):                          # READ (uno) · solo GET: la ficha del cliente (opcional)
+    cliente = get_object_or_404(Cliente, pk=pk)
+    return render(request, "facturacion/cliente_detalle.html", {"titulo": str(cliente), "cliente": cliente})
+
+
+@login_required
+def cliente_eliminar(request, pk):                         # DELETE · GET pregunta, POST borra
+    cliente = get_object_or_404(Cliente, pk=pk)
+    if request.method == "POST":                           # POST: presionó "Sí, eliminar"
+        nombre = str(cliente)                              # Guardamos el nombre para el mensaje
+        cliente.delete()                                   # DELETE en la base de datos
+        messages.success(request, f"Cliente «{nombre}» eliminado.")
+        return redirect("facturacion:cliente_lista")
+    # GET: solo mostramos la pregunta "¿Seguro?"
+    return render(request, "facturacion/cliente_eliminar.html", {"titulo": "Eliminar cliente", "cliente": cliente})

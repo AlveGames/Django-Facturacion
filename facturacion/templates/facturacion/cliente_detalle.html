@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block titulo %}{{ titulo }}{% endblock %}
+
+{% block contenido %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="tarjeta">
+            <h1 class="h4 titulo-pagina mb-3">{{ cliente.apellidos }} {{ cliente.nombres }}</h1>
+            {# Ficha del cliente: una fila por dato. default:"—" si el campo está vacío #}
+            <table class="table m-0">
+                <tr><th style="width:40%">Cédula</th><td>{{ cliente.cedula }}</td></tr>
+                <tr><th>Correo</th><td>{{ cliente.email|default:"—" }}</td></tr>
+                <tr><th>Teléfono</th><td>{{ cliente.telefono|default:"—" }}</td></tr>
+                <tr><th>Dirección</th><td>{{ cliente.direccion|default:"—" }}</td></tr>
+                <tr><th>Registrado el</th><td>{{ cliente.fecha_registro|date:"d/m/Y H:i" }}</td></tr>
+            </table>
+            <div class="mt-3">
+                <a href="{% url 'facturacion:cliente_editar' cliente.pk %}" class="btn btn-outline-primary">Editar</a>
+                <a href="{% url 'facturacion:cliente_lista' %}" class="btn btn-outline-secondary">Volver</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

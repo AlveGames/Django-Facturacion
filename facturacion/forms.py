@@ -1,5 +1,5 @@
 from django import forms                                 # Herramientas de formularios
-from .models import Categoria, Marca, Producto           # Categoria: para la tarea (Unidad 5)                   # NUEVO: también importamos Producto
+from .models import Categoria, Cliente, Marca, Producto           # Categoria: para la tarea (Unidad 5)                   # NUEVO: también importamos Producto
 
 
 class MarcaForm(forms.ModelForm):                        # (Sin cambios, de la Unidad 2)
@@ -69,3 +69,30 @@ class CategoriaForm(forms.ModelForm):                    # Formulario construido
         if len(nombre) < 3:                              # Mínimo 3 letras...
             raise forms.ValidationError("El nombre debe tener al menos 3 letras.")   # ...si no, error en rojo
         return nombre[0].upper() + nombre[1:]            # Solo la PRIMERA letra en mayúscula: "  ofertas " → "Ofertas"
+
+    
+
+# =====================================================================
+# TAREA 2 · CLIENTES (Unidad 5)
+# =====================================================================
+class ClienteForm(forms.ModelForm):                      # Formulario construido desde el modelo Cliente
+    class Meta:
+        model = Cliente
+        # Todos los campos MENOS fecha_registro: esa se llena sola (auto_now_add=True)
+        fields = ["cedula", "nombres", "apellidos", "email", "telefono", "direccion"]
+        widgets = {                                      # Cómo se dibuja cada campo en HTML
+            "cedula": forms.TextInput(attrs={"class": "form-control", "placeholder": "Ej: 0912345678"}),
+            "nombres": forms.TextInput(attrs={"class": "form-control", "placeholder": "Ej: Ana María"}),
+            "apellidos": forms.TextInput(attrs={"class": "form-control", "placeholder": "Ej: Pérez López"}),
+            "email": forms.EmailInput(attrs={"class": "form-control", "placeholder": "Ej: ana@correo.com"}),
+            "telefono": forms.TextInput(attrs={"class": "form-control", "placeholder": "Ej: 0991234567"}),
+            "direccion": forms.TextInput(attrs={"class": "form-control", "placeholder": "Ej: Av. 9 de Octubre"}),
+        }
+
+    def clean_cedula(self):                              # Validación propia (base: clean_precio)
+        cedula = self.cleaned_data["cedula"].strip()     # Quitamos espacios de los lados
+        if len(cedula) != 10:                            # 1. Exactamente 10 caracteres
+            raise forms.ValidationError("La cédula debe tener exactamente 10 dígitos.")
+        if not cedula.isdigit():                         # 2. isdigit(): True solo si TODOS son números
+            raise forms.ValidationError("La cédula debe tener solo números.")
+        return cedula                                    # Que no se repita lo revisa unique=True del modelo

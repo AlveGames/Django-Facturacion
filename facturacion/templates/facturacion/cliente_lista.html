@@ -1,0 +1,61 @@
+{% extends "base.html" %}                             {# Usa el diseño de base.html #}
+{% block titulo %}{{ titulo }}{% endblock %}          {# Pestaña: "Clientes | Mi Tienda" #}
+
+{% block contenido %}
+
+{# ---------- Encabezado: título y botón para crear ---------- #}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <h1 class="h3 titulo-pagina m-0">{{ titulo }}</h1>
+    <a href="{% url 'facturacion:cliente_crear' %}" class="btn btn-verde">+ Nuevo cliente</a>   {# GET: formulario vacío #}
+</div>
+
+{# ---------- Buscador: method="get" → ?q=texto. Busca por apellidos O cédula (objetos Q) ---------- #}
+<form method="get" class="d-flex gap-2 mb-3">
+    <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Buscar por apellidos o cédula...">
+    <button type="submit" class="btn btn-outline-secondary">Buscar</button>
+</form>
+
+{# ---------- Tabla ---------- #}
+<div class="tarjeta p-0 table-responsive">
+    <table class="table table-hover align-middle m-0">
+        <thead>
+            <tr><th>#</th><th>Cédula</th><th>Apellidos y nombres</th><th>Correo</th><th>Teléfono</th><th class="text-end">Acciones</th></tr>
+        </thead>
+        <tbody>
+            {% for cliente in page_obj %}             {# page_obj: solo los 5 clientes de ESTA página #}
+            <tr>
+                <td>{{ page_obj.start_index|add:forloop.counter0 }}</td>   {# Numeración que sigue entre páginas: 6, 7... #}
+                <td>{{ cliente.cedula }}</td>
+                <td class="fw-semibold">{{ cliente.apellidos }} {{ cliente.nombres }}</td>
+                <td>{{ cliente.email|default:"—" }}</td>
+                <td>{{ cliente.telefono|default:"—" }}</td>
+                <td class="text-end text-nowrap">
+                    <a href="{% url 'facturacion:cliente_detalle' cliente.pk %}" class="btn btn-sm btn-outline-secondary">Ver</a>
+                    <a href="{% url 'facturacion:cliente_editar' cliente.pk %}" class="btn btn-sm btn-outline-primary">Editar</a>
+                    <a href="{% url 'facturacion:cliente_eliminar' cliente.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center text-muted py-4">No hay clientes registrados.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<p class="text-muted small mt-2">Total: {{ page_obj.paginator.count }} cliente(s)</p>   {# count = todos, no solo esta página #}
+
+{# ---------- Paginación: &q= mantiene la búsqueda al cambiar de página ---------- #}
+{% if page_obj.has_other_pages %}
+<nav>
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ q|urlencode }}">« Anterior</a></li>
+        {% endif %}
+        <li class="page-item disabled"><span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></li>
+        {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ q|urlencode }}">Siguiente »</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+{% endblock %}

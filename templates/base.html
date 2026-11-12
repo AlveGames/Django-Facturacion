@@ -23,12 +23,9 @@
                     {% if user.is_authenticated %}    {# Los módulos solo se ven si inició sesión #}
                         <li class="nav-item"><a class="nav-link" href="{% url 'facturacion:marca_lista' %}">Marcas</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'facturacion:producto_lista' %}">Productos</a></li>
-                        {# TAREA (Unidad 5): agrega aquí Categorías y Clientes #}
+                        
                         <li class="nav-item"><a class="nav-link" href="{% url 'facturacion:categoria_lista' %}">Categorías</a></li>
-                        git add .
-                         git commit -m "avance"
-                         git push
-                         
+                        <li class="nav-item"><a class="nav-link" href="{% url 'facturacion:cliente_lista' %}">Clientes</a></li>
                     {% endif %}
                 </ul>
 

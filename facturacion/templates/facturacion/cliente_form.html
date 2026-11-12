@@ -1,0 +1,30 @@
+{% extends "base.html" %}                             {# Hereda el diseño #}
+{% block titulo %}{{ titulo }}{% endblock %}          {# "Nuevo cliente" o "Editar cliente: ..." #}
+
+{% block contenido %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+        <div class="tarjeta">
+            <h1 class="h4 titulo-pagina mb-4">{{ titulo }}</h1>
+
+            {# method="post" sin action: se envía a la MISMA dirección (crear o editar) #}
+            {# novalidate: apaga la revisión del navegador para ver los errores de Django #}
+            <form method="post" novalidate>
+                {% csrf_token %}                      {# Obligatorio en todo POST #}
+                <div class="row">
+                    {# Recorremos los 6 campos: cada uno con su etiqueta, su caja y sus errores en rojo #}
+                    {% for campo in form %}
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label" for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+                        {{ campo }}
+                        {% for error in campo.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="btn btn-verde">{{ boton }}</button>   {# "Guardar" o "Actualizar" #}
+                <a href="{% url 'facturacion:cliente_lista' %}" class="btn btn-outline-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
