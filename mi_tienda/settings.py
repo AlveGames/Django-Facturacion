@@ -126,3 +126,6 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+
+
+LOGIN_URL = "login"    # ¿A dónde envía @login_required a quien entra sin sesión? Al name="login" de urls.py

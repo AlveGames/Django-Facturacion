@@ -26,3 +26,18 @@ main { flex: 1; }                     /* ...el main se estira y el footer queda 
 .btn-verde { background-color: var(--verde); color: white; }        /* nuestro botón verde */
 .btn-verde:hover { background-color: var(--verde-claro); color: white; }
 .pie { background-color: #13201a; color: #cfd8d3; }                 /* pie de página oscuro */
+
+/* ---------- Formularios de login y registro ---------- */
+.form-auth input[type="text"],               /* cajas de texto dentro de .form-auth... */
+.form-auth input[type="password"] {          /* ...y cajas de contraseña */
+    display: block;                          /* cada caja ocupa su propia línea */
+    width: 100%;                             /* todo el ancho */
+    padding: .5rem .75rem;                   /* relleno igual al de Bootstrap */
+    border: 1px solid #ced4da;               /* borde gris */
+    border-radius: .375rem;                  /* esquinas redondeadas */
+}
+.form-auth input:focus {                     /* cuando la caja está seleccionada */
+    outline: 2px solid var(--verde-claro);   /* contorno verde */
+    border-color: var(--verde-claro);
+}
+.form-auth .ayuda { font-size: .8rem; color: #6c757d; }   /* textos de ayuda pequeños y grises */

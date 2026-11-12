@@ -6,10 +6,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import MarcaForm, ProductoForm                 # NUEVO: ProductoForm
 from .models import Marca, Producto                        # NUEVO: Producto
 
+from django.contrib.auth.decorators import login_required
+
+
 # =====================================================================
 # MARCAS · Vistas Basadas en Funciones (VBF)
 # =====================================================================
-
+@login_required
 def marca_lista(request):                                  # READ: muestra todas las marcas
     q = request.GET.get("q", "")                           # 1. Leemos el buscador: /facturacion/marcas/?q=sam (si no hay, queda "")
     marcas = Marca.objects.all()                           # 2. Pedimos todas las marcas a la base de datos
@@ -27,7 +30,7 @@ def marca_lista(request):                                  # READ: muestra todas
 
 
 
-
+@login_required
 def marca_crear(request):                                  # CREATE: crear una marca nueva
 
     if request.method == "POST":                           # ¿El usuario presionó "Guardar"? (llegó por POST)
@@ -50,7 +53,7 @@ def marca_crear(request):                                  # CREATE: crear una m
 
 
 
-
+@login_required
 def marca_editar(request, pk):                             # UPDATE. pk llega desde la URL: /marcas/editar/3/ → pk=3
     marca = get_object_or_404(Marca, pk=pk)                # 1. Buscamos la marca. Si no existe → página 404
 
@@ -71,7 +74,7 @@ def marca_editar(request, pk):                             # UPDATE. pk llega de
     return render(request, "facturacion/marca_form.html", contexto)   # ¡El mismo template de crear!
 
 
-
+@login_required
 def marca_eliminar(request, pk):                           # DELETE
     marca = get_object_or_404(Marca, pk=pk)                # Buscamos la marca o mostramos 404
 
@@ -93,7 +96,7 @@ def marca_eliminar(request, pk):                           # DELETE
 # =====================================================================
 # PRODUCTOS · Vistas Basadas en Funciones (VBF)
 # =====================================================================
-
+@login_required
 def producto_lista(request):                               # READ: lista de productos con buscador y páginas
     q = request.GET.get("q", "")                           # 1. Texto del buscador: /productos/?q=laptop (si no hay, "")
 
@@ -117,6 +120,7 @@ def producto_lista(request):                               # READ: lista de prod
     }
     return render(request, "facturacion/producto_lista.html", contexto)
 
+@login_required
 def producto_crear(request):                               # CREATE: crear un producto nuevo
 
     if request.method == "POST":                           # ¿Presionó "Guardar"? (llegó por POST)
@@ -137,7 +141,7 @@ def producto_crear(request):                               # CREATE: crear un pr
     }
     return render(request, "facturacion/producto_form.html", contexto)
 
-
+@login_required
 def producto_editar(request, pk):                          # UPDATE. pk viene de la URL: /productos/editar/7/ → pk=7
     producto = get_object_or_404(Producto, pk=pk)          # 1. Buscamos el producto. Si no existe → página 404
 
@@ -158,12 +162,14 @@ def producto_editar(request, pk):                          # UPDATE. pk viene de
     }
     return render(request, "facturacion/producto_form.html", contexto)   # El mismo template de crear
 
+@login_required
 def producto_detalle(request, pk):                         # READ (uno): la ficha de un producto
     producto = get_object_or_404(Producto, pk=pk)          # Buscamos el producto número pk o mostramos 404
     contexto = {"producto": producto}                      # Solo necesitamos enviar el producto
     return render(request, "facturacion/producto_detalle.html", contexto)
     # Esta vista solo atiende GET: no tiene formulario, así que no pregunta por request.method
 
+@login_required
 def producto_eliminar(request, pk):                        # DELETE
     producto = get_object_or_404(Producto, pk=pk)          # Buscamos el producto o mostramos 404
 
