@@ -1,5 +1,5 @@
 from django import forms                                 # Herramientas de formularios
-from .models import Categoria, Cliente, Marca, Producto           # Categoria: para la tarea (Unidad 5)                   # NUEVO: también importamos Producto
+from .models import Categoria, Cliente, Marca, Producto, Perfil            # Categoria: para la tarea (Unidad 5)                   # NUEVO: también importamos Producto
 
 
 class MarcaForm(forms.ModelForm):                        # (Sin cambios, de la Unidad 2)
@@ -96,3 +96,20 @@ class ClienteForm(forms.ModelForm):                      # Formulario construido
         if not cedula.isdigit():                         # 2. isdigit(): True solo si TODOS son números
             raise forms.ValidationError("La cédula debe tener solo números.")
         return cedula                                    # Que no se repita lo revisa unique=True del modelo
+
+
+
+# =====================================================================
+# RETO · MI PERFIL (relación 1:1 con User)
+# =====================================================================
+class PerfilForm(forms.ModelForm):                       # Formulario construido desde el modelo Perfil
+    class Meta:
+        model = Perfil
+        # SIN "usuario": ese no lo elige nadie, siempre es request.user (lo pone la vista)
+        fields = ["cedula", "telefono", "direccion", "cargo"]
+        widgets = {
+            "cedula": forms.TextInput(attrs={"class": "form-control", "placeholder": "Ej: 0912345678"}),
+            "telefono": forms.TextInput(attrs={"class": "form-control", "placeholder": "Ej: 0991234567"}),
+            "direccion": forms.TextInput(attrs={"class": "form-control", "placeholder": "Ej: Av. 9 de Octubre"}),
+            "cargo": forms.TextInput(attrs={"class": "form-control", "placeholder": "Ej: Vendedor"}),
+        }

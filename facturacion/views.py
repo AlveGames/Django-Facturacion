@@ -3,8 +3,8 @@ from django.core.paginator import Paginator                # NUEVO: corta una li
 from django.db.models import ProtectedError, Q             # Q: buscar con "O" (reto Clientes)                # Error al borrar una marca que tiene productos
 from django.shortcuts import render, redirect, get_object_or_404
 
-from .forms import CategoriaForm, ClienteForm, MarcaForm, ProductoForm
-from .models import Categoria, Cliente, Marca, Producto           # Categoria: tarea Unidad 5
+from .forms import CategoriaForm, ClienteForm, MarcaForm, PerfilForm, ProductoForm
+from .models import Categoria, Cliente, Marca, Perfil, Producto       # Categoria: tarea Unidad 5
 
 from django.contrib.auth.decorators import login_required
 
@@ -317,3 +317,27 @@ def cliente_eliminar(request, pk):                         # DELETE · GET pregu
         return redirect("facturacion:cliente_lista")
     # GET: solo mostramos la pregunta "¿Seguro?"
     return render(request, "facturacion/cliente_eliminar.html", {"titulo": "Eliminar cliente", "cliente": cliente})
+
+
+
+# =====================================================================
+# RETO · MI PERFIL (relación 1:1) · Vista Basada en Función
+# =====================================================================
+
+@login_required
+def mi_perfil(request):                                    # Sin <int:pk>: el perfil es SIEMPRE el del usuario conectado
+    # get_or_create busca el perfil de este usuario; si no existe, lo crea vacío.
+    # Devuelve DOS cosas: el perfil y True/False (si lo acaba de crear)
+    perfil, creado = Perfil.objects.get_or_create(usuario=request.user)
+    # Desde aquí, el mismo patrón de marca_editar con instance=perfil
+    if request.method == "POST":                           # POST: presionó "Guardar cambios"
+        form = PerfilForm(request.POST, instance=perfil)   # Datos nuevos sobre SU perfil (no crea otro)
+        if form.is_valid():
+            form.save()                                    # UPDATE de facturacion_perfil
+            messages.success(request, "Tu perfil se actualizó correctamente.")
+            return redirect("facturacion:mi_perfil")       # Vuelve a la MISMA página (Post/Redirect/Get)
+        messages.error(request, "Revisa los errores del formulario.")
+    else:                                                  # GET: formulario LLENO con sus datos actuales
+        form = PerfilForm(instance=perfil)
+    contexto = {"titulo": "Mi perfil", "form": form, "perfil": perfil}
+    return render(request, "facturacion/mi_perfil.html", contexto)

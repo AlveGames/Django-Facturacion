@@ -27,4 +27,6 @@ urlpatterns = [
     path("clientes/<int:pk>/", views.cliente_detalle, name="cliente_detalle"),             # Ver uno (opcional)
     path("clientes/editar/<int:pk>/", views.cliente_editar, name="cliente_editar"),        # Editar
     path("clientes/eliminar/<int:pk>/", views.cliente_eliminar, name="cliente_eliminar"),  # Eliminar
+        # ---------- RETO · MI PERFIL (1:1) ----------
+    path("mi-perfil/", views.mi_perfil, name="mi_perfil"),   # Sin <int:pk>: siempre el perfil de request.user
 ]

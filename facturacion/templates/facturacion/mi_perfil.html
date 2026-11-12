@@ -1,0 +1,35 @@
+{% extends "base.html" %}                             {# Hereda el diseño #}
+{% block titulo %}{{ titulo }}{% endblock %}          {# Pestaña: "Mi perfil | Mi Tienda" #}
+
+{% block contenido %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+        <div class="tarjeta">
+            <h1 class="h4 titulo-pagina mb-1">{{ titulo }}</h1>
+            {# Datos que vienen de User (auth_user): solo se muestran, no se editan aquí #}
+            <p class="text-muted mb-4">
+                Usuario: <b>{{ user.username }}</b>
+                {% if user.email %} · {{ user.email }}{% endif %}
+                · Desde {{ user.date_joined|date:"d/m/Y" }}
+            </p>
+
+            {# method="post" sin action: se envía a /facturacion/mi-perfil/ #}
+            <form method="post" novalidate>
+                {% csrf_token %}                      {# Obligatorio en todo POST #}
+                <div class="row">
+                    {# Los 4 campos de Perfil: cédula, teléfono, dirección y cargo #}
+                    {% for campo in form %}
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label" for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+                        {{ campo }}
+                        {% for error in campo.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="btn btn-verde">Guardar cambios</button>
+                <a href="{% url 'home' %}" class="btn btn-outline-secondary">Volver al inicio</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

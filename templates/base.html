@@ -33,6 +33,7 @@
                 <ul class="navbar-nav align-items-lg-center gap-2">
                     {% if user.is_authenticated %}    {# CON sesión: saludo y botón para salir #}
                         <li class="nav-item navbar-text">Hola, <b>{{ user.username }}</b></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'facturacion:mi_perfil' %}">Mi perfil</a></li>   {# Reto 1:1 #}
                         <li class="nav-item">
                             {# Cerrar sesión es POST (la vista salir tiene @require_POST): por eso es un formulario y no un enlace #}
                             <form method="post" action="{% url 'logout' %}" class="m-0">   {# action: a dónde se envía #}
