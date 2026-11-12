@@ -1,5 +1,5 @@
 from django import forms                                 # Herramientas de formularios
-from .models import Marca, Producto                      # NUEVO: también importamos Producto
+from .models import Categoria, Marca, Producto           # Categoria: para la tarea (Unidad 5)                   # NUEVO: también importamos Producto
 
 
 class MarcaForm(forms.ModelForm):                        # (Sin cambios, de la Unidad 2)
@@ -47,3 +47,25 @@ class ProductoForm(forms.ModelForm):                     # NUEVO: formulario de 
         if precio <= 0:                                  # Si es 0 o negativo...
             raise forms.ValidationError("El precio debe ser mayor que 0.")   # ...error en rojo bajo el campo
         return precio                                    # Si está bien, lo devolvemos
+
+
+# =====================================================================
+# TAREA 1 · CATEGORÍAS (Unidad 5)
+# =====================================================================
+class CategoriaForm(forms.ModelForm):                    # Formulario construido desde el modelo Categoria
+    class Meta:
+        model = Categoria                                # ¿De qué modelo sale? De Categoria
+        fields = ["nombre", "descripcion", "activo"]     # Campos que muestra y en qué orden
+        labels = {"nombre": "Nombre de la categoría"}    # Texto de la etiqueta del campo nombre
+        widgets = {                                      # Cómo se dibuja cada campo en HTML
+            "nombre": forms.TextInput(attrs={"class": "form-control", "placeholder": "Ej: Laptops"}),
+            # Textarea = caja grande de varias líneas (igual que la descripción de Producto)
+            "descripcion": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
+            "activo": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
+
+    def clean_nombre(self):                              # Validación propia del campo nombre
+        nombre = self.cleaned_data["nombre"].strip()     # Quitamos los espacios de los lados
+        if len(nombre) < 3:                              # Mínimo 3 letras...
+            raise forms.ValidationError("El nombre debe tener al menos 3 letras.")   # ...si no, error en rojo
+        return nombre[0].upper() + nombre[1:]            # Solo la PRIMERA letra en mayúscula: "  ofertas " → "Ofertas"

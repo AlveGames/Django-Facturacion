@@ -1,0 +1,53 @@
+{% extends "base.html" %}                             {# Usa el diseño de base.html #}
+{% block titulo %}{{ titulo }}{% endblock %}          {# Pestaña: "Categorías | Mi Tienda" #}
+
+{% block contenido %}
+
+{# ---------- Encabezado: título y botón para crear ---------- #}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <h1 class="h3 titulo-pagina m-0">{{ titulo }}</h1>
+    {# Un enlace siempre hace GET: abre el formulario vacío #}
+    <a href="{% url 'facturacion:categoria_crear' %}" class="btn btn-verde">+ Nueva categoría</a>
+</div>
+
+{# ---------- Buscador: method="get" envía el texto en la URL como ?q=texto ---------- #}
+<form method="get" class="d-flex gap-2 mb-3">
+    <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Buscar categoría...">
+    <button type="submit" class="btn btn-outline-secondary">Buscar</button>
+</form>
+
+{# ---------- Tabla ---------- #}
+<div class="tarjeta p-0 table-responsive">
+    <table class="table table-hover align-middle m-0">
+        <thead>
+            <tr><th>#</th><th>Nombre</th><th>Descripción</th><th class="text-center">Productos</th><th>Estado</th><th class="text-end">Acciones</th></tr>
+        </thead>
+        <tbody>
+            {% for categoria in categorias %}         {# Una fila por cada categoría #}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td class="fw-semibold">{{ categoria.nombre }}</td>
+                <td>{{ categoria.descripcion|default:"—"|truncatechars:50 }}</td>   {# Corta textos largos #}
+                {# N:M al revés: related_name="productos" → cuántos productos tiene esta categoría #}
+                <td class="text-center"><span class="badge bg-light text-dark border">{{ categoria.productos.count }}</span></td>
+                <td>
+                    {% if categoria.activo %}
+                        <span class="badge bg-success">Activo</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Inactivo</span>
+                    {% endif %}
+                </td>
+                <td class="text-end text-nowrap">
+                    <a href="{% url 'facturacion:categoria_editar' categoria.pk %}" class="btn btn-sm btn-outline-primary">Editar</a>
+                    <a href="{% url 'facturacion:categoria_eliminar' categoria.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center text-muted py-4">No hay categorías registradas.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<p class="text-muted small mt-2">Total: {{ categorias|length }} categoría(s)</p>
+
+{% endblock %}

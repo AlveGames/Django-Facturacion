@@ -16,4 +16,9 @@ urlpatterns = [
     path("productos/editar/<int:pk>/", views.producto_editar, name="producto_editar"),
     path("productos/<int:pk>/", views.producto_detalle, name="producto_detalle"),   # /facturacion/productos/7/
     path("productos/eliminar/<int:pk>/", views.producto_eliminar, name="producto_eliminar"),
+        # ---------- CATEGORÍAS (Tarea 1 · Unidad 5) ----------
+    path("categorias/", views.categoria_lista, name="categoria_lista"),                          # Listar
+    path("categorias/crear/", views.categoria_crear, name="categoria_crear"),                    # Crear
+    path("categorias/editar/<int:pk>/", views.categoria_editar, name="categoria_editar"),        # Editar
+    path("categorias/eliminar/<int:pk>/", views.categoria_eliminar, name="categoria_eliminar"),  # Eliminar
 ]

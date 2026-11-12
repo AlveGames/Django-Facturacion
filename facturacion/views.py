@@ -3,8 +3,8 @@ from django.core.paginator import Paginator                # NUEVO: corta una li
 from django.db.models import ProtectedError                # Error al borrar una marca que tiene productos
 from django.shortcuts import render, redirect, get_object_or_404
 
-from .forms import MarcaForm, ProductoForm                 # NUEVO: ProductoForm
-from .models import Marca, Producto                        # NUEVO: Producto
+from .forms import CategoriaForm, MarcaForm, ProductoForm  # CategoriaForm: tarea Unidad 5
+from .models import Categoria, Marca, Producto             # Categoria: tarea Unidad 5
 
 from django.contrib.auth.decorators import login_required
 
@@ -182,3 +182,63 @@ def producto_eliminar(request, pk):                        # DELETE
     # Llegó por GET: mostramos la pregunta "¿Seguro?"
     contexto = {"titulo": "Eliminar producto", "producto": producto}
     return render(request, "facturacion/producto_eliminar.html", contexto)
+
+
+
+
+# =====================================================================
+# TAREA 1 · CATEGORÍAS · Vistas Basadas en Funciones (VBF)
+# Base: el CRUD de Marcas (pasos 2.13 a 2.17)
+# =====================================================================
+
+@login_required                                            # Sin sesión → /login/?next=...
+def categoria_lista(request):                              # READ · solo GET: lista y busca
+    q = request.GET.get("q", "")                           # GET: lo que escribió en el buscador (?q=lap). Si no hay, ""
+    categorias = Categoria.objects.all()                   # Todas las categorías (ordenadas A → Z por el Meta)
+    if q:                                                  # Si buscó algo...
+        categorias = categorias.filter(nombre__icontains=q)    # ...solo las que contienen ese texto
+    contexto = {"titulo": "Categorías", "categorias": categorias, "q": q}
+    return render(request, "facturacion/categoria_lista.html", contexto)
+
+
+@login_required
+def categoria_crear(request):                              # CREATE
+    if request.method == "POST":                           # POST: el usuario presionó "Guardar"
+        form = CategoriaForm(request.POST)                 # Formulario lleno con lo que escribió
+        if form.is_valid():                                # ¿Datos correctos? (obligatorio, único, clean_nombre)
+            categoria = form.save()                        # INSERT en la base de datos
+            messages.success(request, f"Categoría «{categoria.nombre}» creada correctamente.")
+            return redirect("facturacion:categoria_lista") # Post/Redirect/Get: F5 no la guarda dos veces
+        # Si NO es válido, baja al render y muestra el formulario con los errores en rojo
+    else:                                                  # GET: solo abrió la página
+        form = CategoriaForm()                             # Formulario vacío
+    contexto = {"titulo": "Nueva categoría", "form": form, "boton": "Guardar"}
+    return render(request, "facturacion/categoria_form.html", contexto)
+
+
+@login_required
+def categoria_editar(request, pk):                         # UPDATE · pk viene de la URL: /categorias/editar/3/
+    categoria = get_object_or_404(Categoria, pk=pk)        # La buscamos; si no existe → 404
+    if request.method == "POST":                           # POST: presionó "Actualizar"
+        form = CategoriaForm(request.POST, instance=categoria)   # Datos nuevos sobre la categoría que ya existe
+        if form.is_valid():
+            form.save()                                    # UPDATE (no crea otra)
+            messages.success(request, f"Categoría «{categoria.nombre}» actualizada.")
+            return redirect("facturacion:categoria_lista")
+    else:                                                  # GET: formulario LLENO con los datos actuales
+        form = CategoriaForm(instance=categoria)
+    contexto = {"titulo": f"Editar categoría: {categoria.nombre}", "form": form, "boton": "Actualizar"}
+    return render(request, "facturacion/categoria_form.html", contexto)   # Mismo template que crear
+
+
+@login_required
+def categoria_eliminar(request, pk):                       # DELETE · GET pregunta, POST borra
+    categoria = get_object_or_404(Categoria, pk=pk)
+    if request.method == "POST":                           # POST: presionó "Sí, eliminar"
+        nombre = categoria.nombre                          # Guardamos el nombre para el mensaje
+        categoria.delete()                                 # DELETE. Es N:M: solo se borran sus pares en la tabla
+        messages.success(request, f"Categoría «{nombre}» eliminada.")   # intermedia; los productos siguen existiendo
+        return redirect("facturacion:categoria_lista")     # No hace falta try/except: nada la protege con PROTECT
+    # GET: mostramos la pregunta "¿Seguro?" y cuántos productos la usan
+    contexto = {"titulo": "Eliminar categoría", "categoria": categoria}
+    return render(request, "facturacion/categoria_eliminar.html", contexto)
